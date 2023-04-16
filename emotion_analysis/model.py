@@ -25,6 +25,7 @@ class EmotionModel(nn.Module):
         batch_size = x.size(0)
         embeds = self.embedding(x) # [1, 79, 200]
         lstm_out, hidden = self.lstm(embeds, hidden) # [1, 79, 128]
+        print(hidden.shape)
 
         lstm_out = lstm_out.contiguous().view(-1, self.hidden_dim)  #[79, 128]
     
