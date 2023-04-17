@@ -1,26 +1,14 @@
-import re
-import nltk
-import string
 import numpy as np
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer, WordNetLemmatizer
-from sklearn.feature_extraction.text import TfidfVectorizer
 import neattext.functions as nfx
-
-from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split
 import nltk
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-import string
-import re
-from nltk.stem import WordNetLemmatizer
+
 import os
 
 cwd = os.path.dirname(__file__)
+
+# nltk.download('wordnet')
 
 
 def word_lemmatization(sentence):
@@ -30,9 +18,8 @@ def word_lemmatization(sentence):
     sentence = " ".join(sentence)
     return sentence
 
-def clean_data(file_path):
-    df = pd.read_csv(file_path)
-    df['Clean_Text'] = df['Text'].apply(nfx.remove_stopwords)
+def clean_text(df, text_col_name):
+    df['Clean_Text'] = df[text_col_name].apply(nfx.remove_stopwords)
     df['Clean_Text'] = df['Clean_Text'].apply(nfx.remove_userhandles)
     df['Clean_Text'] = df['Clean_Text'].apply(nfx.remove_punctuations)
     df['Clean_Text'] = df['Clean_Text'].apply(nfx.remove_emojis)
@@ -44,14 +31,30 @@ def clean_data(file_path):
 
     df['Clean_Text'].replace('', np.nan, inplace=True)
     df = df.dropna()
+    return df
     
-    df = df[['Clean_Text', 'Emotion']]
-    
-    print(df['Clean_Text'].head())
 
+def clean_data(file_path, text_col, emotion_col, change_emotion=None):
+    df = pd.read_csv(file_path)
+    df = clean_text(df, text_col)
+    df = df[['Clean_Text', emotion_col]]
+
+    if change_emotion:
+        for k,v in change_emotion.items():
+            df.replace(to_replace=k, value=v, inplace=True)
+    
+    return df
+    
+def export_csv(df, change_emotion=None):
+    
+    if change_emotion:
+        for k,v in change_emotion.items():
+            df.replace(to_replace=k, value=v, inplace=True)
+    
     emotions = df['Emotion'].unique()
+    print(emotions)
     emotion_mapping = {emotion:idx for idx, emotion in enumerate(emotions)}
-
+    
     df['emotion_encoded'] = df['Emotion'].map(emotion_mapping)
 
     text_labels = df[['emotion_encoded', 'Emotion']]
@@ -60,4 +63,45 @@ def clean_data(file_path):
     train_data.to_csv(os.path.join(cwd, "data.csv"), index=False)
     
 if __name__ == "__main__":
-    clean_data(os.path.join(cwd, "emotion_dataset.csv"))
+    df1 = clean_data(os.path.join(cwd, "emotion_dataset.csv"), "Text", "Emotion")
+
+    change_emotion = {
+        'empty':'shame',
+        'joy': "surprise",
+        'fun': "joy",
+        'hate': "anger",
+        'relief': 'neutral',
+        'love': 'joy',
+        'worry': 'fear',
+        'boredom': 'neutral',
+        'happiness': 'joy',
+        'enthusiasm': 'joy',
+    }
+    
+    
+    change_emotion2 = {
+        # 'fear': 'bad',
+        # 'surprise': 'good',
+        # 'anger': 'bad',
+        'shame': 'anger',
+        # 'neutral': 'good',
+        'disgust': 'anger',
+        # 'joy': 'good',
+        # 'sadness': 'bad'
+    }
+
+    combine = False
+     
+    if combine:
+        df2 = clean_data(os.path.join(cwd, "tweet_emotions.csv"), "content", "sentiment", change_emotion)
+        
+        # Rename columns
+        new_cols = {x: y for x, y in zip(df2.columns, df1.columns)}
+        df2 = df2.rename(columns=new_cols)
+        combined_df = pd.concat([df1, df2], ignore_index=True)
+        combined_df.drop_duplicates(subset=['Clean_Text'])
+    
+        export_csv(combined_df, change_emotion=change_emotion2)
+    else:
+        export_csv(df1, change_emotion=None)
+    

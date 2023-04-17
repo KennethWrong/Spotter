@@ -3,6 +3,7 @@ import time
 # import playsound
 import speech_recognition as sr
 from gtts import gTTS
+from emotion_analysis.solver 
 
 def get_audio():
     r = sr.Recognizer()
@@ -23,6 +24,5 @@ if __name__ == "__main__":
     while True:
         said = get_audio()
         
-        if said.lower() == "hello":
-            print("Yes?")
-    
+        if said:
+             model_evaluate
