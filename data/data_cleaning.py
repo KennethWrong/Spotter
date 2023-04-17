@@ -1,22 +1,10 @@
-import re
-import nltk
-import string
 import numpy as np
 import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer, WordNetLemmatizer
-from sklearn.feature_extraction.text import TfidfVectorizer
 import neattext.functions as nfx
 
-from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split
-import nltk
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-import string
-import re
 from nltk.stem import WordNetLemmatizer
 import os
 
