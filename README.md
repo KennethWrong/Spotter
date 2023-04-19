@@ -14,3 +14,5 @@ Our “Spotify Helper”, which is a python Spotify SDK that I have found called
 
 Do note that to run this project you would need to provide a Spotify Client ID and Spotify Client Secret, details to this could be found here.
 
+## Image of Spotter web application
+![alt text](misc/spotter_homepage.png)
