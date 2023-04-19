@@ -4,6 +4,9 @@ import time
 import speech_recognition as sr
 from gtts import gTTS
 
+from emotion_analysis.model import EmotionModel
+from spotter import Spotter
+
 def get_audio():
     r = sr.Recognizer()
     with sr.Microphone() as source:
@@ -20,9 +23,13 @@ def get_audio():
 
 
 if __name__ == "__main__":
+    emotion_model = EmotionModel()
+    spotter = Spotter()
+
     while True:
         said = get_audio()
-        
-        if said.lower() == "hello":
-            print("Yes?")
-    
+
+        if "hello" in said.lower():
+            emotion = emotion_model.get_emotion(said)
+            print(emotion)
+            spotter.play_song_by_emotion(emotion)
