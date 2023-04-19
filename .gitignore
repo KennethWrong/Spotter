@@ -1,3 +1,5 @@
 .env
 data/glove
 data/*.csv
+__pycache__
+.cache
